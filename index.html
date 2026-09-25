@@ -5,29 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Phatty Preset Manager — Moog Little Phatty & Slim Phatty SysEx Librarian | Fabio Synth</title>
 <meta name="description" content="Free browser-based preset librarian for the Moog Little Phatty and Slim Phatty. Backup, browse, compare and restore synth patches via MIDI SysEx, directly from your browser. Part of the Fabio Synth toolset, alongside the Little Phatty / Slim Phatty parameter editor.">
-<meta name="keywords" content="Fabio Synth, Moog editor, Moog Little Phatty editor, Little Phatty editor, Slim Phatty, Moog Little Phatty, Moog Slim Phatty, SysEx preset manager, preset librarian, MIDI sysex backup, Moog patch librarian, synth preset librarian">
+<meta name="keywords" content="Fabio Synth, Moog editor, Moog Little Phatty editor, Moog Little Phatty manager, Little Phatty editor, Little Phatty manager, Slim Phatty, Slim Phatty editor, Slim Phatty manager, Moog Little Phatty, Moog Slim Phatty, SysEx preset manager, preset librarian, MIDI sysex backup, Moog patch librarian, synth preset librarian">
 <meta name="author" content="Fabio Synth">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="theme-color" content="#0a2647">
+<meta name="application-name" content="Phatty Preset Manager">
+<meta name="apple-mobile-web-app-title" content="Phatty Preset Manager">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<!-- Canonical / social share URL — replace with the real published address once the page is hosted -->
+<link rel="canonical" href="https://www.fabiosynth.com/phatty-preset-manager/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%230f2d54'/%3E%3Cpath d='M7 24c3 0 3-8 6-8s3 8 6 8 3-8 6-8 3 8 6 8 2-4 2-4' fill='none' stroke='%231fe0a0' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Fabio Synth">
+<meta property="og:url" content="https://www.fabiosynth.com/phatty-preset-manager/">
 <meta property="og:title" content="Phatty Preset Manager — Moog Little Phatty & Slim Phatty SysEx Librarian">
-<meta property="og:description" content="Free browser-based preset librarian for the Moog Little Phatty and Slim Phatty: backup, browse and restore patches via MIDI SysEx.">
+<meta property="og:description" content="Free browser-based preset librarian and manager for the Moog Little Phatty and Slim Phatty: backup, browse and restore patches via MIDI SysEx.">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Phatty Preset Manager — Moog Little Phatty & Slim Phatty SysEx Librarian">
-<meta name="twitter:description" content="Free browser-based preset librarian for the Moog Little Phatty and Slim Phatty, by Fabio Synth.">
+<meta name="twitter:description" content="Free browser-based preset librarian and manager for the Moog Little Phatty and Slim Phatty, by Fabio Synth.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Phatty Preset Manager",
+  "alternateName": ["Moog Little Phatty Preset Manager", "Slim Phatty Preset Manager", "Little Phatty SysEx Librarian"],
   "applicationCategory": "MultimediaApplication",
   "operatingSystem": "Any (runs in a web browser via Web MIDI)",
   "description": "Browser-based SysEx preset manager for the Moog Little Phatty and Slim Phatty synthesizers. Backup, browse, compare and restore presets over MIDI.",
   "creator": { "@type": "Person", "name": "Fabio Synth" },
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "keywords": "Moog editor, Little Phatty editor, Slim Phatty, Moog Little Phatty, SysEx preset manager, Fabio Synth"
+  "keywords": "Moog editor, Moog Little Phatty editor, Moog Little Phatty manager, Little Phatty editor, Little Phatty manager, Slim Phatty, Slim Phatty editor, Slim Phatty manager, Moog Little Phatty, SysEx preset manager, preset librarian, Fabio Synth"
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -250,6 +258,15 @@
 </head>
 <body>
 
+<noscript>
+  <p style="font:16px/1.5 sans-serif; max-width:640px; margin:24px auto; padding:0 16px;">
+    <strong>Phatty Preset Manager</strong> is a free browser-based SysEx preset manager and librarian
+    for the Moog Little Phatty and Moog Slim Phatty synthesizers. Backup, browse, compare and restore
+    your Little Phatty / Slim Phatty patches over MIDI, right from your browser — no install required.
+    Enable JavaScript and connect a MIDI interface to use it.
+  </p>
+</noscript>
+
 <header class="appbar">
   <div class="appbar-in">
     <div class="brand">
@@ -259,7 +276,7 @@
       </svg>
       <div>
         <h1>Phatty Preset Manager</h1>
-        <p>SysEx backup and restore for Moog Little Phatty and Slim Phatty</p>
+        <p>SysEx preset manager &amp; librarian for Moog Little Phatty and Slim Phatty — backup, browse and restore patches</p>
       </div>
     </div>
     <div class="chip" role="status"><span class="dot" id="led"></span><span id="statusText">Starting MIDI…</span></div>
