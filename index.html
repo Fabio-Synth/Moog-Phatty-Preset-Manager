@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phatty Preset Manager — Moog Little Phatty & Slim Phatty SysEx Librarian | Fabio Synth</title>
+<meta name="description" content="Free browser-based preset librarian for the Moog Little Phatty and Slim Phatty. Backup, browse, compare and restore synth patches via MIDI SysEx, directly from your browser. Part of the Fabio Synth toolset, alongside the Little Phatty / Slim Phatty parameter editor.">
+<meta name="keywords" content="Fabio Synth, Moog editor, Moog Little Phatty editor, Little Phatty editor, Slim Phatty, Moog Little Phatty, Moog Slim Phatty, SysEx preset manager, preset librarian, MIDI sysex backup, Moog patch librarian, synth preset librarian">
+<meta name="author" content="Fabio Synth">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a2647">
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fabio Synth">
+<meta property="og:title" content="Phatty Preset Manager — Moog Little Phatty & Slim Phatty SysEx Librarian">
+<meta property="og:description" content="Free browser-based preset librarian for the Moog Little Phatty and Slim Phatty: backup, browse and restore patches via MIDI SysEx.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Phatty Preset Manager — Moog Little Phatty & Slim Phatty SysEx Librarian">
+<meta name="twitter:description" content="Free browser-based preset librarian for the Moog Little Phatty and Slim Phatty, by Fabio Synth.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Phatty Preset Manager",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Any (runs in a web browser via Web MIDI)",
+  "description": "Browser-based SysEx preset manager for the Moog Little Phatty and Slim Phatty synthesizers. Backup, browse, compare and restore presets over MIDI.",
+  "creator": { "@type": "Person", "name": "Fabio Synth" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "keywords": "Moog editor, Little Phatty editor, Slim Phatty, Moog Little Phatty, SysEx preset manager, Fabio Synth"
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#dfeaf5; --bg-1:#e9f3fa; --bg-2:#eaf1f6;
+    --card:#ffffff; --card-2:#eef4fa; --line:#d3e0ee; --line2:#e3edf6;
+    --ink:#0f1b2d; --ink2:#3c5066; --ink-dim:#66798d;
+    --head:#0a2647;
+    --accent:#2f6fed; --accent-dim:#1a4fc4; --accent-glow:rgba(47,111,237,.32); --accent-tint:rgba(47,111,237,.11);
+    --green:#0fb873; --green-dim:#0a8f59; --green-glow:rgba(15,184,115,.32); --green-tint:rgba(15,184,115,.11);
+    --signal:var(--accent); --signal-dim:var(--accent-dim); --signal-glow:var(--accent-glow); --signal-tint:var(--accent-tint);
+    --danger:#e0324f; --danger-bg:#fdeef1; --ok:#0fb873; --warn-bg:rgba(47,111,237,.08);
+    --slate:#5c7291; --slate-dim:#33455c; --slate-tint:rgba(92,114,145,.08);
+    --sans:'Barlow Semi Condensed','Arial Narrow','Helvetica Neue',Arial,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --r-sm:8px; --r-md:10px; --r-lg:14px;
+    --sh-1:0 1px 2px rgba(10,38,71,.06); --sh-2:0 10px 26px rgba(10,38,71,.08); --sh-3:0 20px 46px rgba(10,38,71,.16);
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; min-height:100vh; color:var(--ink); font:16px/1.5 var(--sans);
+    background:
+      radial-gradient(1100px 520px at 8% -8%, rgba(47,111,237,.10), transparent 60%),
+      radial-gradient(900px 460px at 105% 15%, rgba(15,184,115,.09), transparent 55%),
+      repeating-linear-gradient(90deg, rgba(10,38,71,.025) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg, rgba(10,38,71,.025) 0 1px, transparent 1px 64px),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-2));
+  }
+  .sr,.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+  /* ---------- header ---------- */
+  .appbar{background:var(--head); color:#fff; background-image:radial-gradient(900px 240px at 8% -30%, rgba(47,111,237,.55), transparent 60%), radial-gradient(700px 220px at 92% 130%, rgba(15,184,115,.4), transparent 60%); box-shadow:0 1px 0 rgba(0,0,0,.25)}
+  .appbar-in{max-width:1180px; margin:0 auto; padding:22px 24px; display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; justify-content:space-between}
+  .brand{display:flex; align-items:center; gap:14px}
+  .logo{width:40px; height:40px; flex:none; filter:drop-shadow(0 3px 8px rgba(0,0,0,.3))}
+  h1{margin:0; font-size:1.6rem; font-weight:700; letter-spacing:.02em; line-height:1.15}
+  .brand p{margin:3px 0 0; color:#9aa4b0; font-size:.87rem; letter-spacing:.01em}
+  .chip{display:inline-flex; align-items:center; gap:9px; padding:7px 14px; border:1px solid rgba(255,255,255,.2); border-radius:999px; font-family:var(--mono); font-size:.78rem; font-weight:600; letter-spacing:.03em; text-transform:uppercase; background:rgba(255,255,255,.1); backdrop-filter:blur(6px); box-shadow:var(--sh-1)}
+  .dot{width:9px; height:9px; border-radius:50%; background:#8391a3; flex:none; box-shadow:0 0 0 3px rgba(255,255,255,.1) inset}
+  .dot.on{background:var(--green); box-shadow:0 0 9px 2px var(--green-glow)}
+  .dot.err{background:var(--danger)}
+
+  .devicebar{background:var(--card); border-bottom:1px solid var(--line); box-shadow:var(--sh-1)}
+  .devicebar-in{max-width:1180px; margin:0 auto; padding:16px 24px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:flex-end}
+  .field{display:flex; flex-direction:column; gap:6px; font-family:var(--mono); font-size:.7rem; font-weight:700; color:var(--ink-dim); letter-spacing:.09em; text-transform:uppercase}
+  select,input[type=text],input[type=number]{font:inherit; font-size:.94rem; font-weight:500; color:var(--ink); background:var(--card-2); border:1px solid var(--line); border-radius:var(--r-sm); padding:7px 10px; min-height:36px; transition:border-color .15s, box-shadow .15s}
+  select:hover,input[type=text]:hover,input[type=number]:hover{border-color:var(--ink-dim)}
+  select{min-width:130px; max-width:240px}
+  select.narrow{min-width:72px}
+  input[type=number]{width:5.5em}
+  :is(select,input,button):focus-visible{outline:none; border-color:var(--signal); box-shadow:0 0 0 3px var(--signal-glow)}
+  .grow{flex:1}
+
+  .safe{background:var(--warn-bg); border-bottom:1px solid var(--line)}
+  .safe-in{max-width:1180px; margin:0 auto; padding:12px 24px; display:flex; align-items:center; gap:11px; font-size:.92rem}
+  .safe-in b{font-weight:700}
+  .safe-icon{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:#fff; color:var(--accent-dim); flex:none; box-shadow:var(--sh-1)}
+  .safe-icon svg{width:15px; height:15px}
+
+  /* ---------- contact / support bar ---------- */
+  .contact-bar{background:linear-gradient(90deg, var(--slate-dim), var(--slate)); box-shadow:inset 0 -1px 0 rgba(0,0,0,.12)}
+  .contact-bar-in{display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:9px 24px; max-width:1180px; margin:0 auto}
+  .contact-bar .contact-label{font-family:var(--mono); font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#fff; opacity:.92; margin-right:2px}
+
+  .browser-note{background:transparent}
+  .browser-note-in{max-width:1180px; margin:0 auto; padding:6px 24px; display:flex; align-items:center; gap:8px; font-size:.76rem; color:var(--ink-dim); font-style:italic}
+  .browser-note-in svg{width:13px; height:13px; flex:none; color:var(--slate); opacity:.8}
+  .browser-note-in b{color:var(--ink2); font-weight:700; font-style:normal}
+  .contact-links{display:flex; align-items:center; gap:4px; margin-right:auto}
+  .contact-links a{display:flex; align-items:center; justify-content:center; width:29px; height:29px; border-radius:var(--r-sm); color:rgba(255,255,255,.82); border:1px solid transparent; transition:color .15s, background .15s, border-color .15s}
+  .contact-links a svg{width:16px; height:16px}
+  .contact-links a:hover{color:#fff; background:rgba(255,255,255,.16)}
+  .contact-links a:focus-visible{outline:none; box-shadow:0 0 0 2px var(--slate-dim), 0 0 0 4px rgba(255,255,255,.6)}
+  .support-prompt{font-size:.82rem; color:rgba(255,255,255,.8); white-space:nowrap}
+  .btn-support{display:inline-flex; align-items:center; gap:7px; padding:6px 14px; border-radius:20px; font-weight:700; font-size:.84rem;
+    color:var(--slate-dim); background:#fff; border:1px solid #fff; text-decoration:none; white-space:nowrap; transition:background .15s, color .15s, box-shadow .15s}
+  .btn-support svg{width:15px; height:15px; flex:none}
+  .btn-support:hover{background:var(--accent); border-color:var(--accent); color:#fff}
+  .btn-support:focus-visible{outline:none; box-shadow:0 0 0 2px var(--slate-dim), 0 0 0 4px rgba(255,255,255,.6)}
+  .qr-pop-wrap{position:relative}
+  .qr-pop-wrap summary{display:flex; align-items:center; justify-content:center; width:29px; height:29px; border-radius:var(--r-sm);
+    color:rgba(255,255,255,.82); border:1px solid transparent; cursor:pointer; list-style:none; transition:color .15s, background .15s, border-color .15s}
+  .qr-pop-wrap summary::-webkit-details-marker{display:none}
+  .qr-pop-wrap summary svg{width:17px; height:17px}
+  .qr-pop-wrap summary:hover{color:#fff; background:rgba(255,255,255,.16)}
+  .qr-pop-wrap summary:focus-visible{outline:none; box-shadow:0 0 0 2px var(--slate-dim), 0 0 0 4px rgba(255,255,255,.6)}
+  .qr-pop-wrap[open] summary{color:#fff; background:rgba(255,255,255,.16)}
+  .qr-pop{position:absolute; top:calc(100% + 10px); right:0; z-index:30; width:164px; padding:14px;
+    background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 14px 34px rgba(20,26,33,.18); text-align:center}
+  .qr-pop .qr-code{display:block; width:100%; height:auto; border-radius:4px}
+  .qr-pop p{margin:9px 0 0; font-size:.72rem; line-height:1.3; color:var(--ink-dim)}
+  @media (max-width:560px){ .qr-pop{right:auto; left:50%; transform:translateX(-50%)} }
+
+  /* ---------- help ---------- */
+  .qhelp{flex:none; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--ink-dim); background:#fff; color:var(--ink2); font:700 13px/1 var(--sans); cursor:pointer; display:inline-grid; place-items:center; padding:0}
+  .qhelp:hover{border-color:var(--ink); color:var(--ink)}
+  .qhelp[aria-expanded="true"]{background:var(--ink); border-color:var(--ink); color:#fff}
+  .helpbox{margin:0 0 14px; padding:12px 14px; background:var(--accent-tint); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--r-sm); font-size:.92rem; color:#222a33}
+  .helpbox p{margin:0 0 8px}
+  .helpbox p:last-child,.helpbox ol:last-child,.helpbox ul:last-child{margin-bottom:0}
+  .helpbox ol,.helpbox ul{margin:0 0 8px; padding-left:20px}
+  .helpbox li{margin:2px 0}
+  .helpbox.inline{margin:8px 0 0}
+  .safe .qhelp{background:transparent}
+
+  /* ---------- layout ---------- */
+  .layout{max-width:1180px; margin:0 auto; padding:28px 24px; display:grid; gap:22px; grid-template-columns:minmax(0,320px) minmax(0,1fr); align-items:start}
+  @media (max-width:900px){ .layout{grid-template-columns:minmax(0,1fr); padding:16px} .appbar-in,.devicebar-in,.safe-in,.contact-bar-in,.browser-note-in{padding-left:16px; padding-right:16px} }
+  .card{background:var(--card); border:1px solid var(--line); border-left:3px solid var(--signal); border-radius:var(--r-lg); box-shadow:var(--sh-1), var(--sh-2); transition:box-shadow .2s, transform .2s; overflow:hidden}
+  .card:hover{box-shadow:0 2px 4px rgba(30,38,48,.06), 0 16px 34px rgba(30,38,48,.1); transform:translateY(-1px)}
+  .card-h{display:flex; align-items:center; gap:10px; padding:15px 18px; background:var(--signal-tint); border-bottom:1px solid var(--line)}
+  .step{width:25px; height:25px; border-radius:50%; background:var(--signal); color:#fff; font:700 .8rem/1 var(--mono); display:grid; place-items:center; flex:none; box-shadow:0 0 0 4px var(--signal-tint), 0 0 8px 1px var(--signal-glow)}
+  .card-h h2{margin:0; font-family:var(--mono); font-size:.8rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--signal-dim); flex:1; white-space:nowrap}
+  .tag{display:inline-block; margin-left:6px; padding:1px 6px; font-size:.6rem; font-weight:700; letter-spacing:.06em; color:currentColor; background:#fff; border:1px solid currentColor; border-radius:999px; vertical-align:1px; opacity:.85}
+  .card-b{padding:20px}
+  .sub{margin:0 0 14px; color:var(--ink2); font-size:.92rem}
+  .card.card-green{border-left-color:var(--green)}
+  .card.card-green .card-h{background:var(--green-tint)}
+  .card.card-green .step{background:var(--green); box-shadow:0 0 0 4px var(--green-tint), 0 0 8px 1px var(--green-glow)}
+  .card.card-green .card-h h2{color:var(--green-dim)}
+
+  /* ---------- buttons ---------- */
+  .btn{font:600 .92rem var(--sans); letter-spacing:.01em; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent-dim)); border:1px solid var(--accent-dim); border-radius:var(--r-sm); padding:9px 16px; min-height:38px; cursor:pointer; transition:filter .15s, box-shadow .15s, transform .1s; box-shadow:0 1px 2px rgba(10,38,71,.15)}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:#fff; color:var(--ink2); border-color:var(--line)}
+  .btn.ghost:hover{background:var(--card-2); border-color:var(--slate); filter:none}
+  .btn.danger{background:linear-gradient(135deg,var(--danger),#b91f3a); border-color:#b91f3a}
+  .btn.danger:hover{filter:brightness(1.08)}
+  .btn.sm{padding:4px 10px; min-height:29px; font-size:.85rem}
+  .btn:disabled{opacity:.4; cursor:not-allowed}
+  .btn:disabled:hover{filter:none}
+  .btn:disabled:active{transform:none}
+  .btn.ghost:disabled:hover{background:#fff}
+  .row{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+
+  /* ---------- capture ---------- */
+  .tiles{display:grid; gap:10px}
+  .tile{text-align:left; font:inherit; background:var(--card-2); border:1px solid var(--line); border-radius:var(--r-md); padding:13px 15px; cursor:pointer; display:grid; gap:2px; transition:border-color .15s, background .15s, box-shadow .15s}
+  .tile:hover:not(:disabled){border-color:var(--signal); background:#fff; box-shadow:0 0 0 1px var(--signal-tint)}
+  .tile:disabled{opacity:.45; cursor:not-allowed}
+  .tile b{font-weight:700}
+  .tile span{color:var(--ink2); font-size:.86rem}
+  .capstate{display:flex; align-items:center; gap:10px; margin:14px 0 0; padding:11px 13px; border-radius:var(--r-md); background:var(--card-2); color:var(--ink2); font-size:.9rem; min-height:44px}
+  .capstate.armed{background:var(--accent-tint); color:var(--accent-dim)}
+  .pulse{width:9px; height:9px; border-radius:50%; background:var(--accent); flex:none}
+  .armed .pulse{animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1; transform:scale(1)}50%{opacity:.35; transform:scale(.7)}}
+  @media (prefers-reduced-motion:reduce){ .armed .pulse{animation:none} }
+  .capstate:not(.armed) .pulse{background:var(--ink-dim)}
+
+  /* ---------- library ---------- */
+  .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px}
+  .toolbar .spacer{flex:1}
+  .tblwrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r-md)}
+  table.lib{width:100%; border-collapse:collapse; min-width:660px; font-size:.9rem}
+  .lib th{position:sticky; top:0; text-align:left; padding:11px 12px; background:var(--card-2); color:var(--ink-dim); font-family:var(--mono); font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid var(--line)}
+  .lib td{padding:10px 12px; border-bottom:1px solid var(--line2); vertical-align:middle}
+  .lib tr:last-child td{border-bottom:0}
+  .lib tbody tr:nth-child(even) td{background:rgba(20,26,33,.014)}
+  .lib tr:hover td{background:rgba(47,111,237,.05)}
+  .lib .mono{font-family:var(--mono); font-size:.84rem}
+  .lib td.name input{width:100%; min-width:120px; border-color:transparent; background:transparent; padding:4px 6px}
+  .lib td.name input:hover,.lib td.name input:focus{border-color:var(--line); background:#fff}
+  .pill{display:inline-block; padding:2px 10px; border-radius:999px; border:1px solid var(--line); font-family:var(--mono); font-size:.72rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; white-space:nowrap}
+  .pill.bank{background:var(--accent-tint); border-color:#b8c9f5; color:var(--accent-dim)}
+  .pill.altro{background:var(--danger-bg); border-color:#f3b9c6; color:var(--danger)}
+  .acts{display:flex; gap:4px; flex-wrap:nowrap}
+  .lib td.nowrap{white-space:nowrap}
+  .lib .model{font-size:.78rem; color:var(--ink2); margin-top:2px}
+  .empty{padding:30px 12px; text-align:center; color:var(--ink2)}
+  .result{margin-top:14px; padding:13px 15px; background:var(--card-2); border-radius:var(--r-md); font-size:.9rem}
+  .result h3{margin:0 0 4px; font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); font-weight:700}
+  .result .mono{font-family:var(--mono); font-size:.85rem}
+
+  .status{max-width:1180px; margin:0 auto; padding:0 24px 8px}
+  .status p{margin:0; padding:12px 15px; border:1px solid var(--line); border-radius:var(--r-md); background:var(--card); color:var(--ink2); font-size:.9rem; box-shadow:var(--sh-1)}
+  .logwrap{max-width:1180px; margin:0 auto; padding:0 24px 32px}
+  .logwrap summary{cursor:pointer; font-weight:600; padding:6px 0; color:var(--ink2); font-size:.9rem}
+  .logwrap summary:hover{color:var(--ink)}
+  .logwrap pre{margin:6px 0 0; height:160px; overflow:auto; padding:10px 12px; background:var(--head); color:#c9d0d8; font:12.5px/1.5 var(--mono); border-radius:var(--r-md)}
+  @media (max-width:900px){ .status,.logwrap{padding-left:16px; padding-right:16px} }
+
+  /* ---------- footer ---------- */
+  .appfooter{border-top:1px solid var(--line); padding:22px 24px 30px}
+  .appfooter-in{max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:9px; text-align:center; font-family:var(--mono); font-size:.76rem; letter-spacing:.03em; color:var(--ink-dim)}
+  .appfooter-in .fb{font-weight:700; color:var(--ink2); text-transform:uppercase; letter-spacing:.08em}
+  .appfooter-in .fs{color:var(--line)}
+  .appfooter-in a{color:var(--ink2); font-weight:600; text-decoration:none; border-bottom:1px solid transparent; transition:color .15s, border-color .15s}
+  .appfooter-in a:hover{color:var(--signal-dim); border-color:currentColor}
+
+  /* ---------- send dialog ---------- */
+  dialog{border:0; border-radius:var(--r-lg); padding:0; width:min(580px,calc(100% - 24px)); max-height:calc(100vh - 32px); box-shadow:var(--sh-3); color:var(--ink); font:inherit}
+  dialog::backdrop{background:rgba(15,18,22,.6)}
+  .dlg-h{display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--line2); background:var(--signal-tint)}
+  .dlg-h h2{margin:0; font-family:var(--mono); font-size:.98rem; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--signal-dim); flex:1}
+  .x{border:0; background:transparent; font-size:1.5rem; line-height:1; cursor:pointer; color:var(--ink2); padding:2px 8px; border-radius:7px}
+  .x:hover{background:var(--card-2)}
+  .dlg-b{padding:16px 20px; display:grid; gap:14px}
+  .dlg-f{display:flex; justify-content:flex-end; gap:8px; padding:14px 20px; border-top:1px solid var(--line2); background:var(--card-2)}
+  .item{margin:0; padding:11px 13px; background:var(--card-2); border-radius:var(--r-md); font-size:.9rem}
+  .item b{font-weight:700}
+  .lock{padding:11px 13px; border:1px solid var(--line); border-radius:var(--r-md)}
+  label.chk{display:flex; gap:9px; align-items:flex-start; font-size:.92rem}
+  label.chk input{margin-top:.28em}
+  ul.check{list-style:none; margin:0; padding:0; display:grid; gap:5px; font-size:.9rem}
+  ul.check li{padding-left:1.6em; position:relative}
+  ul.check li::before{position:absolute; left:0; font-weight:700}
+  ul.check li.ok::before{content:"✓"; color:var(--ok)}
+  ul.check li.no::before{content:"✗"; color:var(--danger)}
+  .slotrow{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:flex-end}
+  .box-h{display:flex; align-items:center; gap:8px; font-weight:700; font-size:.92rem}
+  .stack{display:grid; gap:10px}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-in">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" aria-hidden="true">
+        <rect width="40" height="40" rx="9" fill="#0f2d54"/>
+        <path d="M7 24c3 0 3-8 6-8s3 8 6 8 3-8 6-8 3 8 6 8 2-4 2-4" fill="none" stroke="#1fe0a0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Phatty Preset Manager</h1>
+        <p>SysEx backup and restore for Moog Little Phatty and Slim Phatty</p>
+      </div>
+    </div>
+    <div class="chip" role="status"><span class="dot" id="led"></span><span id="statusText">Starting MIDI…</span></div>
+  </div>
+</header>
+
+<div class="devicebar">
+  <div class="devicebar-in">
+    <label class="field">MODEL <select id="selModel"></select></label>
+    <label class="field">MIDI IN <select id="selIn"></select></label>
+    <label class="field">MIDI OUT <select id="selOut"></select></label>
+    <label class="field">OUT CHANNEL <select id="selChOut" class="narrow"></select></label>
+    <span class="grow"></span>
+    <button type="button" class="qhelp" aria-expanded="false" aria-controls="help-device" title="Help"><span aria-hidden="true">?</span><span class="sr">Help: connection settings</span></button>
+  </div>
+  <div class="devicebar-in" id="help-device" hidden style="padding-top:0">
+    <div class="helpbox grow" style="margin:0">
+      <p><b>Model</b> tags every recording, and prevents a Little Phatty dump from being sent to a Slim Phatty (and vice versa). It is set automatically when the port name contains “Slim” or “Little”.</p>
+      <p><b>MIDI In</b> is the port the synth sends its data to; <b>MIDI Out</b> is the port used to send data back to the synth.</p>
+      <p>On Windows the Slim Phatty often appears as “USB Audio Device”: choose it manually once and it will be remembered.</p>
+      <p>On the synth, open <b>MASTER → MIDI SETUP</b> and make sure MIDI Input and MIDI Output are set to <b>USB</b> or <b>DIN/USB</b> (factory default), and that the MIDI channels are not OFF.</p>
+    </div>
+  </div>
+</div>
+
+<div class="browser-note">
+  <div class="browser-note-in">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="15.5" r=".1"/></svg>
+    <span>Uses Web MIDI: works in <b>Chrome</b>, <b>Edge</b>, <b>Opera</b> or <b>Brave</b> (desktop and Android), and in <b>Firefox</b> on desktop. <b>Safari</b> doesn't support Web MIDI yet.</span>
+  </div>
+</div>
+
+<nav class="contact-bar" aria-label="Contact and support">
+ <div class="contact-bar-in">
+  <span class="contact-label">Fabio Synth</span>
+  <div class="contact-links">
+    <a href="https://fabiopiras.synthonia.com/" target="_blank" rel="noopener" title="Sound library">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.6-4-9s1.5-6.5 4-9z"/></svg>
+      <span class="sr-only">Sound library</span>
+    </a>
+    <a href="https://www.youtube.com/@FabioSynth" target="_blank" rel="noopener" title="YouTube">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5.5" width="20" height="13" rx="4"/><path d="M10.2 9.3l5.4 2.7-5.4 2.7V9.3z" fill="currentColor" stroke="none"/></svg>
+      <span class="sr-only">YouTube</span>
+    </a>
+    <a href="https://www.facebook.com/fabio.synth/" target="_blank" rel="noopener" title="Facebook">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M13.7 16.2v-4.9h1.7l.3-2.3h-2V7.6c0-.6.3-1 1.1-1h1V4.7c-.3 0-1-.1-1.8-.1-1.8 0-3 1.1-3 3.1v1.7H9.3v2.3h1.7v4.9"/></svg>
+      <span class="sr-only">Facebook</span>
+    </a>
+    <a href="https://www.instagram.com/fabiosynth/" target="_blank" rel="noopener" title="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>
+      <span class="sr-only">Instagram</span>
+    </a>
+    <a href="mailto:fabiosynth.lab@gmail.com" title="Email">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M4 7.2l8 6 8-6"/></svg>
+      <span class="sr-only">Email</span>
+    </a>
+  </div>
+  <span class="support-prompt">Enjoying the editor?</span>
+  <a class="btn-support" href="https://www.paypal.com/paypalme/fabiosynth" target="_blank" rel="noopener" title="Buy me a coffee on PayPal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9h12v5a5 5 0 0 1-5 5h-2a5 5 0 0 1-5-5V9z"/><path d="M16.5 10h1.3a2.4 2.4 0 0 1 0 4.8h-1.3"/><path d="M8 3c0 1-1 1-1 2M12 3c0 1-1 1-1 2"/></svg>
+    Buy me a coffee
+  </a>
+  <details class="qr-pop-wrap">
+    <summary title="Scan to donate" aria-label="Show PayPal QR code">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3"/><path d="M16 4h3a1 1 0 0 1 1 1v3"/><path d="M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+    </summary>
+    <div class="qr-pop">
+      <svg class="qr-code" viewBox="0 0 31 31" role="img" aria-label="QR code linking to PayPal.me/fabiosynth">
+        <rect width="31" height="31" fill="#fff"/>
+        <path d="M1,1H2V2H1zM2,1H3V2H2zM3,1H4V2H3zM4,1H5V2H4zM5,1H6V2H5zM6,1H7V2H6zM7,1H8V2H7zM13,1H14V2H13zM15,1H16V2H15zM19,1H20V2H19zM21,1H22V2H21zM23,1H24V2H23zM24,1H25V2H24zM25,1H26V2H25zM26,1H27V2H26zM27,1H28V2H27zM28,1H29V2H28zM29,1H30V2H29zM1,2H2V3H1zM7,2H8V3H7zM9,2H10V3H9zM10,2H11V3H10zM11,2H12V3H11zM13,2H14V3H13zM14,2H15V3H14zM15,2H16V3H15zM17,2H18V3H17zM18,2H19V3H18zM21,2H22V3H21zM23,2H24V3H23zM29,2H30V3H29zM1,3H2V4H1zM3,3H4V4H3zM4,3H5V4H4zM5,3H6V4H5zM7,3H8V4H7zM9,3H10V4H9zM11,3H12V4H11zM15,3H16V4H15zM16,3H17V4H16zM21,3H22V4H21zM23,3H24V4H23zM25,3H26V4H25zM26,3H27V4H26zM27,3H28V4H27zM29,3H30V4H29zM1,4H2V5H1zM3,4H4V5H3zM4,4H5V5H4zM5,4H6V5H5zM7,4H8V5H7zM9,4H10V5H9zM12,4H13V5H12zM14,4H15V5H14zM16,4H17V5H16zM17,4H18V5H17zM18,4H19V5H18zM20,4H21V5H20zM21,4H22V5H21zM23,4H24V5H23zM25,4H26V5H25zM26,4H27V5H26zM27,4H28V5H27zM29,4H30V5H29zM1,5H2V6H1zM3,5H4V6H3zM4,5H5V6H4zM5,5H6V6H5zM7,5H8V6H7zM10,5H11V6H10zM15,5H16V6H15zM17,5H18V6H17zM20,5H21V6H20zM21,5H22V6H21zM23,5H24V6H23zM25,5H26V6H25zM26,5H27V6H26zM27,5H28V6H27zM29,5H30V6H29zM1,6H2V7H1zM7,6H8V7H7zM11,6H12V7H11zM13,6H14V7H13zM14,6H15V7H14zM19,6H20V7H19zM21,6H22V7H21zM23,6H24V7H23zM29,6H30V7H29zM1,7H2V8H1zM2,7H3V8H2zM3,7H4V8H3zM4,7H5V8H4zM5,7H6V8H5zM6,7H7V8H6zM7,7H8V8H7zM9,7H10V8H9zM11,7H12V8H11zM13,7H14V8H13zM15,7H16V8H15zM17,7H18V8H17zM19,7H20V8H19zM21,7H22V8H21zM23,7H24V8H23zM24,7H25V8H24zM25,7H26V8H25zM26,7H27V8H26zM27,7H28V8H27zM28,7H29V8H28zM29,7H30V8H29zM9,8H10V9H9zM10,8H11V9H10zM12,8H13V9H12zM13,8H14V9H13zM15,8H16V9H15zM16,8H17V9H16zM19,8H20V9H19zM20,8H21V9H20zM21,8H22V9H21zM1,9H2V10H1zM7,9H8V10H7zM9,9H10V10H9zM12,9H13V10H12zM14,9H15V10H14zM15,9H16V10H15zM16,9H17V10H16zM18,9H19V10H18zM20,9H21V10H20zM22,9H23V10H22zM23,9H24V10H23zM26,9H27V10H26zM27,9H28V10H27zM28,9H29V10H28zM1,10H2V11H1zM3,10H4V11H3zM4,10H5V11H4zM5,10H6V11H5zM8,10H9V11H8zM10,10H11V11H10zM11,10H12V11H11zM12,10H13V11H12zM14,10H15V11H14zM16,10H17V11H16zM19,10H20V11H19zM20,10H21V11H20zM22,10H23V11H22zM24,10H25V11H24zM25,10H26V11H25zM27,10H28V11H27zM28,10H29V11H28zM1,11H2V12H1zM2,11H3V12H2zM6,11H7V12H6zM7,11H8V12H7zM9,11H10V12H9zM10,11H11V12H10zM11,11H12V12H11zM12,11H13V12H12zM16,11H17V12H16zM17,11H18V12H17zM19,11H20V12H19zM21,11H22V12H21zM22,11H23V12H22zM4,12H5V13H4zM5,12H6V13H5zM8,12H9V13H8zM10,12H11V13H10zM15,12H16V13H15zM20,12H21V13H20zM24,12H25V13H24zM26,12H27V13H26zM2,13H3V14H2zM4,13H5V14H4zM6,13H7V14H6zM7,13H8V14H7zM8,13H9V14H8zM9,13H10V14H9zM10,13H11V14H10zM16,13H17V14H16zM17,13H18V14H17zM20,13H21V14H20zM21,13H22V14H21zM23,13H24V14H23zM24,13H25V14H24zM29,13H30V14H29zM2,14H3V15H2zM3,14H4V15H3zM4,14H5V15H4zM10,14H11V15H10zM11,14H12V15H11zM12,14H13V15H12zM14,14H15V15H14zM16,14H17V15H16zM17,14H18V15H17zM18,14H19V15H18zM20,14H21V15H20zM21,14H22V15H21zM23,14H24V15H23zM25,14H26V15H25zM28,14H29V15H28zM29,14H30V15H29zM1,15H2V16H1zM2,15H3V16H2zM3,15H4V16H3zM5,15H6V16H5zM6,15H7V16H6zM7,15H8V16H7zM10,15H11V16H10zM12,15H13V16H12zM13,15H14V16H13zM14,15H15V16H14zM15,15H16V16H15zM16,15H17V16H16zM19,15H20V16H19zM22,15H23V16H22zM24,15H25V16H24zM26,15H27V16H26zM27,15H28V16H27zM4,16H5V17H4zM5,16H6V17H5zM6,16H7V17H6zM8,16H9V17H8zM9,16H10V17H9zM10,16H11V17H10zM11,16H12V17H11zM13,16H14V17H13zM15,16H16V17H15zM16,16H17V17H16zM20,16H21V17H20zM22,16H23V17H22zM23,16H24V17H23zM24,16H25V17H24zM25,16H26V17H25zM27,16H28V17H27zM29,16H30V17H29zM4,17H5V18H4zM7,17H8V18H7zM13,17H14V18H13zM14,17H15V18H14zM15,17H16V18H15zM16,17H17V18H16zM18,17H19V18H18zM20,17H21V18H20zM24,17H25V18H24zM26,17H27V18H26zM27,17H28V18H27zM1,18H2V19H1zM3,18H4V19H3zM4,18H5V19H4zM6,18H7V19H6zM9,18H10V19H9zM11,18H12V19H11zM12,18H13V19H12zM13,18H14V19H13zM15,18H16V19H15zM16,18H17V19H16zM17,18H18V19H17zM20,18H21V19H20zM22,18H23V19H22zM23,18H24V19H23zM24,18H25V19H24zM25,18H26V19H25zM27,18H28V19H27zM28,18H29V19H28zM29,18H30V19H29zM1,19H2V20H1zM2,19H3V20H2zM6,19H7V20H6zM7,19H8V20H7zM8,19H9V20H8zM12,19H13V20H12zM13,19H14V20H13zM14,19H15V20H14zM16,19H17V20H16zM18,19H19V20H18zM19,19H20V20H19zM20,19H21V20H20zM21,19H22V20H21zM22,19H23V20H22zM26,19H27V20H26zM29,19H30V20H29zM1,20H2V21H1zM3,20H4V21H3zM6,20H7V21H6zM12,20H13V21H12zM16,20H17V21H16zM17,20H18V21H17zM19,20H20V21H19zM21,20H22V21H21zM22,20H23V21H22zM24,20H25V21H24zM25,20H26V21H25zM1,21H2V22H1zM3,21H4V22H3zM4,21H5V22H4zM5,21H6V22H5zM6,21H7V22H6zM7,21H8V22H7zM8,21H9V22H8zM9,21H10V22H9zM10,21H11V22H10zM12,21H13V22H12zM14,21H15V22H14zM15,21H16V22H15zM18,21H19V22H18zM20,21H21V22H20zM21,21H22V22H21zM22,21H23V22H22zM23,21H24V22H23zM24,21H25V22H24zM25,21H26V22H25zM27,21H28V22H27zM28,21H29V22H28zM29,21H30V22H29zM9,22H10V23H9zM11,22H12V23H11zM12,22H13V23H12zM13,22H14V23H13zM14,22H15V23H14zM15,22H16V23H15zM16,22H17V23H16zM17,22H18V23H17zM19,22H20V23H19zM21,22H22V23H21zM25,22H26V23H25zM26,22H27V23H26zM1,23H2V24H1zM2,23H3V24H2zM3,23H4V24H3zM4,23H5V24H4zM5,23H6V24H5zM6,23H7V24H6zM7,23H8V24H7zM16,23H17V24H16zM17,23H18V24H17zM19,23H20V24H19zM20,23H21V24H20zM21,23H22V24H21zM23,23H24V24H23zM25,23H26V24H25zM26,23H27V24H26zM27,23H28V24H27zM1,24H2V25H1zM7,24H8V25H7zM10,24H11V25H10zM11,24H12V25H11zM12,24H13V25H12zM13,24H14V25H13zM17,24H18V25H17zM20,24H21V25H20zM21,24H22V25H21zM25,24H26V25H25zM29,24H30V25H29zM1,25H2V26H1zM3,25H4V26H3zM4,25H5V26H4zM5,25H6V26H5zM7,25H8V26H7zM10,25H11V26H10zM12,25H13V26H12zM14,25H15V26H14zM15,25H16V26H15zM16,25H17V26H16zM17,25H18V26H17zM20,25H21V26H20zM21,25H22V26H21zM22,25H23V26H22zM23,25H24V26H23zM24,25H25V26H24zM25,25H26V26H25zM26,25H27V26H26zM28,25H29V26H28zM1,26H2V27H1zM3,26H4V27H3zM4,26H5V27H4zM5,26H6V27H5zM7,26H8V27H7zM10,26H11V27H10zM16,26H17V27H16zM17,26H18V27H17zM18,26H19V27H18zM19,26H20V27H19zM20,26H21V27H20zM22,26H23V27H22zM24,26H25V27H24zM26,26H27V27H26zM27,26H28V27H27zM29,26H30V27H29zM1,27H2V28H1zM3,27H4V28H3zM4,27H5V28H4zM5,27H6V28H5zM7,27H8V28H7zM10,27H11V28H10zM11,27H12V28H11zM14,27H15V28H14zM16,27H17V28H16zM17,27H18V28H17zM23,27H24V28H23zM24,27H25V28H24zM25,27H26V28H25zM26,27H27V28H26zM27,27H28V28H27zM28,27H29V28H28zM1,28H2V29H1zM7,28H8V29H7zM13,28H14V29H13zM19,28H20V29H19zM23,28H24V29H23zM24,28H25V29H24zM26,28H27V29H26zM27,28H28V29H27zM29,28H30V29H29zM1,29H2V30H1zM2,29H3V30H2zM3,29H4V30H3zM4,29H5V30H4zM5,29H6V30H5zM6,29H7V30H6zM7,29H8V30H7zM9,29H10V30H9zM12,29H13V30H12zM13,29H14V30H13zM18,29H19V30H18zM20,29H21V30H20zM22,29H23V30H22zM24,29H25V30H24zM25,29H26V30H25zM26,29H27V30H26zM27,29H28V30H27z" fill="#161b1f"/>
+      </svg>
+      <p>Scan to donate via PayPal</p>
+    </div>
+  </details>
+ </div>
+</nav>
+
+<div class="safe">
+  <div class="safe-in">
+    <span class="safe-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 7.9-7 9-4-1.1-7-4.4-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>
+    <span><b>Exact copies only.</b> This tool never edits or creates preset data: it only records dumps sent by your synth and replays them unchanged.</span>
+    <button type="button" class="qhelp" aria-expanded="false" aria-controls="help-safe" title="Help"><span aria-hidden="true">?</span><span class="sr">Help: safety</span></button>
+  </div>
+  <div class="safe-in" id="help-safe" hidden style="padding-top:0">
+    <div class="helpbox" style="margin:0; background:#fff">
+      <p>Presets travel as MIDI System Exclusive (SysEx) messages. The same channel is used by firmware updates, so this page applies strict limits:</p>
+      <ul>
+        <li>Only messages with the Moog manufacturer ID and a valid SysEx structure are accepted.</li>
+        <li>Anything larger than 64 KB is rejected. A complete bank is roughly 17 KB.</li>
+        <li>A recording is classified as “Single preset” or “Full bank” by its size. Anything else is stored as “Unclassified” and can never be sent.</li>
+        <li>Before every send, the data is checked again (CRC32 and structure).</li>
+        <li>Sending is locked by default, needs explicit confirmations, and locks itself again after each send.</li>
+      </ul>
+      <p>Recording is passive: nothing is written to the synth while you record. Only “Send to synth” writes to its memory.</p>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <section class="card" aria-labelledby="h-cap">
+    <div class="card-h">
+      <span class="step">1</span>
+      <h2 id="h-cap">Record from synth <span class="tag">(Save)</span></h2>
+      <button type="button" class="qhelp" aria-expanded="false" aria-controls="help-cap" title="Help"><span aria-hidden="true">?</span><span class="sr">Help: recording</span></button>
+    </div>
+    <div class="card-b">
+      <div class="helpbox" id="help-cap" hidden>
+        <p>The transfer is always started <b>from the synth</b>; this page listens and stores what arrives.</p>
+        <ol>
+          <li>Press <b>MASTER</b>, then <b>CURSOR</b> to highlight the SYSEX menu items.</li>
+          <li>Turn <b>VALUE</b> to <b>SEND CURRENT PRESET</b> (one preset) or <b>SEND ALL PRESETS</b> (whole bank).</li>
+          <li>Click the matching button here.</li>
+          <li>Press <b>ENTER</b> on the synth and wait: a bank takes a few seconds.</li>
+        </ol>
+        <p>“Single preset” saves only the preset currently selected on the synth. To back up several presets, either repeat the procedure for each one or record the full bank once.</p>
+        <p>If a recording is rejected because of its size, the reason is shown in the status bar.</p>
+      </div>
+      <p class="sub">Record one preset or the entire bank sent by your synth.</p>
+      <div class="tiles">
+        <button class="tile" id="btnCapSingle" type="button"><b>Record single preset</b><span>The preset currently selected on the synth</span></button>
+        <button class="tile" id="btnCapBank" type="button"><b>Record full bank</b><span>All presets in the synth’s memory</span></button>
+      </div>
+      <div class="capstate" id="capState" role="status"><span class="pulse"></span><span id="capText">Not recording.</span></div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost sm" id="btnCapCancel" type="button" hidden>Cancel recording</button></div>
+    </div>
+  </section>
+
+  <section class="card card-green" aria-labelledby="h-lib">
+    <div class="card-h">
+      <span class="step">2</span>
+      <h2 id="h-lib">Library <span class="tag">(Load)</span></h2>
+      <button type="button" class="qhelp" aria-expanded="false" aria-controls="help-lib" title="Help"><span aria-hidden="true">?</span><span class="sr">Help: library</span></button>
+    </div>
+    <div class="card-b">
+      <div class="helpbox" id="help-lib" hidden>
+        <p>Recordings are stored in this browser. Use <b>Download</b> to keep a file (.syx) that you can also open in SysEx Librarian or MIDI-OX. <b>Import</b> accepts .syx files, including the factory banks published by Moog.</p>
+        <p>Click a name to rename it. Deleting an entry does not delete files you have downloaded.</p>
+        <p><b>CRC32</b> is a fingerprint of the data. It is recalculated before every send to make sure the stored copy is intact.</p>
+        <p><b>Compare</b>: tick two entries and press <i>Compare selected</i> to see whether they are identical byte for byte. Typical uses:</p>
+        <ul>
+          <li>Check a restore: send a preset, record it again from the synth, then compare the two.</li>
+          <li>Check that two backups of the bank are the same, meaning nothing changed in between.</li>
+          <li>See at which byte positions two recordings differ.</li>
+        </ul>
+        <p>Entries marked <i>Unclassified</i> are archived but cannot be sent.</p>
+      </div>
+      <div class="toolbar">
+        <button class="btn ghost" id="btnImport" type="button">Import .syx…</button>
+        <input type="file" id="fileImport" accept=".syx,application/octet-stream" multiple hidden>
+        <span class="spacer"></span>
+        <button class="btn ghost" id="btnCompare" type="button" disabled>Compare selected (0/2)</button>
+      </div>
+      <div class="tblwrap">
+        <table class="lib">
+          <thead><tr><th style="width:34px"><span class="sr">Select</span></th><th>Name</th><th>Type</th><th>Size / CRC32</th><th>Saved</th><th>Actions</th></tr></thead>
+          <tbody id="libBody"></tbody>
+        </table>
+      </div>
+      <div class="result" id="cmpBox" hidden aria-live="polite"><h3>Comparison</h3><div id="cmpOut"></div></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="status"><p id="msg" aria-live="polite">Ready. Make a bank backup before you send anything to the synth.</p></div>
+
+<div class="logwrap">
+  <details>
+    <summary>SysEx monitor</summary>
+    <pre id="logBox" aria-label="Recent events"></pre>
+  </details>
+</div>
+
+<footer class="appfooter">
+  <div class="appfooter-in">
+    <span class="fb">Phatty Preset Manager</span>
+    <span class="fs" aria-hidden="true">—</span>
+    <span>made by <a href="https://fabiopiras.synthonia.com/" target="_blank" rel="noopener">Fabio Synth</a></span>
+  </div>
+</footer>
+
+<dialog id="sendDlg" aria-labelledby="sendTitle">
+  <div class="dlg-h">
+    <h2 id="sendTitle">Send to synth</h2>
+    <button type="button" class="qhelp" aria-expanded="false" aria-controls="help-send" title="Help"><span aria-hidden="true">?</span><span class="sr">Help: sending</span></button>
+    <button type="button" class="x" id="btnDlgX" aria-label="Close">×</button>
+  </div>
+  <div class="dlg-b">
+    <div class="helpbox" id="help-send" hidden style="margin:0">
+      <p>This writes to the synth’s memory, exactly like SysEx Librarian or MIDI-OX would. Follow the checklist from top to bottom.</p>
+      <ul>
+        <li><b>Backup:</b> record the full bank first (last 60 minutes). It is your way back if anything goes wrong.</li>
+        <li><b>Single preset:</b> according to the Moog manual, the received preset is written into the slot <i>currently selected on the synth</i>. Select it with the VALUE knob, or use “Select slot on synth”, which sends a Program Change (needs Program Change RCV = ON in the synth’s menu, the factory default).</li>
+        <li><b>Full bank:</b> replaces all presets in the synth.</li>
+        <li>Do not switch the synth off or unplug the cable while it shows “RECEIVING”.</li>
+        <li>First time? Try a single preset on a slot you do not care about, then record it again and use Compare to see which slot changed.</li>
+      </ul>
+    </div>
+    <p class="item" id="sendItem"></p>
+    <div class="lock"><label class="chk"><input type="checkbox" id="unlock"><span>Unlock sending. It locks again after every send.</span></label></div>
+    <ul class="check" id="checklist" aria-label="Pre-send checks"></ul>
+
+    <div id="nobackupBox" hidden>
+      <label class="chk"><input type="checkbox" id="ackNoBackup"><span>I have no recent bank backup and want to continue anyway.</span></label>
+    </div>
+
+    <div id="singleBox" hidden class="stack">
+      <div class="box-h">Target slot
+        <button type="button" class="qhelp" aria-expanded="false" aria-controls="help-slot" title="Help"><span aria-hidden="true">?</span><span class="sr">Help: target slot</span></button>
+      </div>
+      <div class="helpbox inline" id="help-slot" hidden style="margin:0">
+        <p>The preset is written into the slot that is selected on the synth when the data arrives. Check the synth’s display before you press Send.</p>
+      </div>
+      <div class="slotrow">
+        <label class="field">SLOT (0–99) <input type="number" id="slotNum" min="0" max="99" value="0"></label>
+        <button class="btn ghost sm" id="btnPC" type="button">Select slot on synth</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="ackSlot"><span>The synth’s display shows the slot I want to overwrite, and I accept that its current content will be lost.</span></label>
+    </div>
+
+    <div id="bankBox" hidden class="stack">
+      <div class="box-h">Replace the whole bank</div>
+      <p style="margin:0; font-size:.9rem; color:var(--ink)">This replaces every preset in the synth. Review the checklist above before sending.</p>
+    </div>
+  </div>
+  <div class="dlg-f">
+    <button class="btn ghost" id="btnDlgCancel" type="button">Cancel</button>
+    <button class="btn danger" id="btnSend" type="button" disabled>Send to synth</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+'use strict';
+
+const $ = id => document.getElementById(id);
+function h(tag, attrs, ...kids){
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) k === 'class' ? (e.className = v) : e.setAttribute(k, v);
+  e.append(...kids);
+  return e;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hex = b => b.toString(16).toUpperCase().padStart(2, '0');
+
+/* ------------------------------------------------------------------
+   Safety constants
+   - Moog manufacturer ID: 0x04
+   - a complete bank is about 16-17 KB, a single preset a few hundred bytes
+   - nothing above MAX_TOTAL is accepted or sent
+------------------------------------------------------------------- */
+const MODELS   = {lp:'Little Phatty', sp:'Slim Phatty'};
+const KINDS    = {single:'Single preset', bank:'Full bank', altro:'Unclassified'};
+const SIZE     = {single:[32, 2048], bank:[8192, 32768]};
+const MAX_MSGS = 8, MAX_TOTAL = 65536, MOOG_ID = 0x04, FRESH_MS = 60 * 60 * 1000;
+const IDLE_MS  = 2000, ABORT_MS = 20000;
+const LS_KEY   = 'phatty-presets-v1';
+
+const S = {library:[], model:'lp', chOut:1, saved:{in:'', out:''}};
+let midi = null, inPort = null, outPort = null, manualIn = false, manualOut = false, portCount = 0;
+let capture = null, capTimer = null, unlocked = false, sending = false, selectedId = null;
+
+/* ------------------------------------------------------------------
+   Bytes, CRC, base64, SysEx parsing
+------------------------------------------------------------------- */
+const CRC_T = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(u8){
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 255] ^ (c >>> 8);
+  return ((c ^ 0xFFFFFFFF) >>> 0).toString(16).toUpperCase().padStart(8, '0');
+}
+function toB64(u8){
+  let s = '';
+  for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function fromB64(b){
+  const s = atob(b), u = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i);
+  return u;
+}
+function concat(msgs){
+  const out = new Uint8Array(msgs.reduce((a, m) => a + m.length, 0));
+  let o = 0;
+  for (const m of msgs){ out.set(m, o); o += m.length; }
+  return out;
+}
+// Splits a byte stream into F0…F7 messages. Returns {msgs} or {err}.
+function parseSysex(u8){
+  const msgs = []; let cur = null;
+  for (const b of u8){
+    if (b === 0xF0){ if (cur) return {err:'unexpected F0 inside a message'}; cur = [0xF0]; }
+    else if (!cur) return {err:'data outside a SysEx message'};
+    else if (b === 0xF7){ cur.push(b); msgs.push(Uint8Array.from(cur)); cur = null; }
+    else if (b & 0x80) return {err:'status byte inside a SysEx message'};
+    else cur.push(b);
+  }
+  if (cur) return {err:'unterminated message (missing F7)'};
+  return {msgs};
+}
+// Returns '' when the messages are acceptable, otherwise the reason for rejection.
+function validate(msgs){
+  if (!msgs || !msgs.length) return 'no SysEx message';
+  if (msgs.length > MAX_MSGS) return 'too many messages (' + msgs.length + ')';
+  let total = 0;
+  for (const m of msgs){
+    if (m.length < 4 || m[0] !== 0xF0 || m[m.length - 1] !== 0xF7) return 'invalid SysEx message';
+    if (m[1] !== MOOG_ID) return 'not a Moog message (manufacturer ID ' + hex(m[1]) + ')';
+    total += m.length;
+  }
+  if (total > MAX_TOTAL) return 'above the ' + MAX_TOTAL + '-byte safety limit';
+  return '';
+}
+function classify(size){
+  if (size >= SIZE.single[0] && size <= SIZE.single[1]) return 'single';
+  if (size >= SIZE.bank[0]   && size <= SIZE.bank[1])   return 'bank';
+  return 'altro';
+}
+
+/* ------------------------------------------------------------------
+   Library
+------------------------------------------------------------------- */
+function makeItem(bytes, count, kind, origin, name){
+  return {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name, kind, model:S.model, origin, size:bytes.length, count,
+    crc:crc32(bytes), date:new Date().toISOString(), b64:toB64(bytes),
+  };
+}
+function itemBytes(it){
+  try {
+    const u = fromB64(it.b64);
+    return (u.length === it.size && crc32(u) === it.crc) ? u : null;
+  } catch (_) { return null; }
+}
+function addItem(it){
+  S.library.push(it);
+  if (!save()){ S.library.pop(); return false; }
+  renderLib();
+  return true;
+}
+function save(){
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(S));
+    return true;
+  } catch (_) {
+    say('Browser storage is full. Download the .syx files you need and delete entries you no longer use.');
+    return false;
+  }
+}
+function load(){
+  try {
+    const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    if (!o) return;
+    if (Array.isArray(o.library)) S.library = o.library.filter(x => x && typeof x.b64 === 'string' && x.id);
+    if (MODELS[o.model]) S.model = o.model;
+    if (o.chOut >= 1 && o.chOut <= 16) S.chOut = o.chOut;
+    if (o.saved) S.saved = {in:o.saved.in || '', out:o.saved.out || ''};
+  } catch (_) {}
+}
+function freshBackup(){
+  return S.library.some(x => x.kind === 'bank' && x.origin === 'synth' && x.model === S.model &&
+                             Date.now() - Date.parse(x.date) <= FRESH_MS);
+}
+function fmtDate(iso){
+  return new Date(iso).toLocaleString('en-GB', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+}
+function download(it){
+  const u = itemBytes(it);
+  if (!u){ say('“' + it.name + '” failed the integrity check: download cancelled.'); return; }
+  const a = h('a', {href:URL.createObjectURL(new Blob([u], {type:'application/octet-stream'})),
+                    download:(it.name.replace(/[^\w\- ]+/g, '_').trim() || 'preset') + '.syx'});
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function renderLib(){
+  const tb = $('libBody');
+  tb.replaceChildren();
+  if (!S.library.length){
+    tb.append(h('tr', {}, h('td', {colspan:'6', class:'empty'}, 'Your library is empty. Record a preset from the synth or import a .syx file.')));
+    updateCompareBtn();
+    return;
+  }
+  const items = [...S.library].sort((a, b) => b.date.localeCompare(a.date));
+  for (const it of items){
+    const tr = h('tr');
+    const chk = h('input', {type:'checkbox', 'aria-label':'Select “' + it.name + '” for comparison'});
+    chk.dataset.id = it.id;
+    chk.addEventListener('change', updateCompareBtn);
+    const name = h('input', {type:'text', value:it.name, 'aria-label':'Name', maxlength:'60'});
+    name.addEventListener('change', () => { it.name = name.value.trim() || it.name; save(); });
+    const acts = h('div', {class:'acts'});
+    const bSend = h('button', {type:'button', class:'btn sm'}, 'Send…');
+    bSend.disabled = it.kind === 'altro';
+    bSend.title = it.kind === 'altro' ? 'Unclassified entries cannot be sent' : '';
+    bSend.addEventListener('click', () => openSend(it.id));
+    const bDl = h('button', {type:'button', class:'btn ghost sm'}, 'Download');
+    bDl.addEventListener('click', () => download(it));
+    const bDel = h('button', {type:'button', class:'btn ghost sm'}, 'Delete');
+    bDel.addEventListener('click', () => {
+      if (!confirm('Delete “' + it.name + '” from this browser’s library? Files you downloaded are not affected.')) return;
+      S.library = S.library.filter(x => x.id !== it.id);
+      save(); renderLib();
+    });
+    acts.append(bSend, bDl, bDel);
+    tr.append(
+      h('td', {}, chk), h('td', {class:'name'}, name),
+      h('td', {class:'nowrap'}, h('span', {class:'pill ' + (it.kind === 'bank' ? 'bank' : it.kind === 'altro' ? 'altro' : '')}, KINDS[it.kind]),
+        h('div', {class:'model'}, MODELS[it.model] || '?')),
+      h('td', {class:'mono nowrap'}, it.size + ' B', h('div', {class:'model mono'}, it.crc)),
+      h('td', {class:'nowrap'}, fmtDate(it.date), h('div', {class:'model'}, it.origin === 'synth' ? 'from synth' : 'from file')),
+      h('td', {class:'nowrap'}, acts));
+    tb.append(tr);
+  }
+  updateCompareBtn();
+}
+function checkedIds(){
+  return [...document.querySelectorAll('#libBody input[type=checkbox]:checked')].map(c => c.dataset.id);
+}
+function updateCompareBtn(){
+  const n = checkedIds().length;
+  $('btnCompare').textContent = 'Compare selected (' + n + '/2)';
+  $('btnCompare').disabled = n !== 2;
+}
+function compareSelected(){
+  const ids = checkedIds();
+  if (ids.length !== 2) return;
+  const a = S.library.find(x => x.id === ids[0]), b = S.library.find(x => x.id === ids[1]);
+  const A = itemBytes(a), B = itemBytes(b);
+  const out = $('cmpOut');
+  $('cmpBox').hidden = false;
+  if (!A || !B){ out.textContent = 'One of the two entries failed the integrity check.'; return; }
+  const n = Math.min(A.length, B.length), diffs = [];
+  for (let i = 0; i < n; i++) if (A[i] !== B[i]) diffs.push(i);
+  const extra = Math.abs(A.length - B.length);
+  out.replaceChildren();
+  out.append(h('div', {}, '“' + a.name + '” (' + A.length + ' B) and “' + b.name + '” (' + B.length + ' B): '));
+  if (!diffs.length && !extra) out.append(h('b', {}, 'identical, byte for byte.'));
+  else out.append(
+    h('b', {}, (diffs.length + extra) + ' byte(s) differ. '),
+    h('span', {}, 'First differing offsets (from 0): '),
+    h('span', {class:'mono'}, diffs.slice(0, 16).join(', ') + (diffs.length > 16 ? ', …' : '')));
+}
+
+/* ------------------------------------------------------------------
+   Recording a dump from the synth
+------------------------------------------------------------------- */
+function armCapture(kind){
+  if (!inPort){ say('Select the synth’s MIDI In port first.'); return; }
+  capture = {kind, msgs:[], cur:null, bytes:0, errors:0, last:performance.now()};
+  clearInterval(capTimer);
+  capTimer = setInterval(checkCapture, 400);
+  log('Waiting for a dump (' + KINDS[kind] + ')');
+  renderCapture();
+}
+function cancelCapture(msg){
+  capture = null; clearInterval(capTimer);
+  if (msg) say(msg);
+  renderCapture();
+}
+function feed(data){
+  const c = capture;
+  for (const b of data){
+    if (b >= 0xF8) continue;                          // real-time messages: ignored
+    if (b === 0xF0){ c.cur = [0xF0]; continue; }
+    if (!c.cur) continue;                             // outside a SysEx
+    if (b === 0xF7){ c.cur.push(b); c.msgs.push(Uint8Array.from(c.cur)); c.bytes += c.cur.length; c.cur = null; continue; }
+    if (b & 0x80){ c.cur = null; c.errors++; continue; }   // unexpected status byte: drop the message
+    c.cur.push(b);
+    if (c.cur.length > MAX_TOTAL){ c.cur = null; c.errors++; }
+  }
+  c.last = performance.now();
+  renderCapture();
+}
+function checkCapture(){
+  const c = capture; if (!c) return;
+  const now = performance.now();
+  if (c.msgs.length && !c.cur && now - c.last >= IDLE_MS) finalizeCapture();
+  else if (c.cur && now - c.last >= ABORT_MS) cancelCapture('Transfer interrupted midway: nothing was saved. Please try again.');
+}
+function finalizeCapture(){
+  const c = capture; capture = null; clearInterval(capTimer);
+  const why = validate(c.msgs);
+  if (why || c.errors){
+    say('Recording discarded: ' + (why || 'data was damaged during reception') + '.');
+    log('Discarded: ' + (why || 'reception errors')); renderCapture(); return;
+  }
+  const bytes = concat(c.msgs);
+  let kind = classify(bytes.length), note = '';
+  if (kind !== c.kind){
+    note = ' Warning: ' + bytes.length + ' bytes do not match “' + KINDS[c.kind] + '”. Saved as unclassified; it cannot be sent.';
+    kind = 'altro';
+  }
+  const stamp = new Date().toLocaleString('en-GB', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+  const base = kind === 'bank' ? 'Bank' : kind === 'single' ? 'Preset' : 'Dump';
+  const it = makeItem(bytes, c.msgs.length, kind, 'synth', base + ' – ' + MODELS[S.model] + ' – ' + stamp);
+  if (addItem(it)){
+    say('Saved “' + it.name + '” (' + bytes.length + ' bytes, CRC32 ' + it.crc + ').' + note);
+    log('Saved ' + KINDS[kind] + ', ' + bytes.length + ' bytes, CRC32 ' + it.crc);
+  }
+  renderCapture();
+}
+function renderCapture(){
+  const st = $('capState'), c = capture;
+  $('btnCapCancel').hidden = !c;
+  $('btnCapSingle').disabled = !!c; $('btnCapBank').disabled = !!c;
+  st.classList.toggle('armed', !!c);
+  $('capText').textContent = !c ? 'Not recording.'
+    : (c.bytes || c.cur)
+      ? 'Receiving… ' + (c.bytes + (c.cur ? c.cur.length : 0)) + ' bytes in ' + c.msgs.length + ' message(s).'
+      : 'Waiting for the synth. Press ENTER on the synth now (' + KINDS[c.kind].toLowerCase() + ').';
+}
+
+/* ------------------------------------------------------------------
+   Sending to the synth
+------------------------------------------------------------------- */
+function resetAcks(){
+  $('ackNoBackup').checked = false; $('ackSlot').checked = false;
+}
+function setUnlocked(v){ unlocked = v; $('unlock').checked = v; renderSend(); }
+function openSend(id){
+  selectedId = id; resetAcks(); unlocked = false; $('unlock').checked = false;
+  renderSend();
+  const d = $('sendDlg');
+  if (!d.open) d.showModal();
+}
+function closeSend(){
+  const d = $('sendDlg');
+  if (d.open) d.close();
+}
+
+function evalSend(){
+  const it = S.library.find(x => x.id === selectedId);
+  if (!it) return {it:null, rows:[], can:false};
+  const bytes = itemBytes(it);
+  const p = bytes ? parseSysex(bytes) : null;
+  const msgs = p && p.msgs ? p.msgs : null;
+  const fresh = freshBackup();
+  const rows = [
+    [unlocked, 'Sending unlocked'],
+    [!!outPort, 'MIDI Out selected' + (outPort ? ': ' + outPort.name : '')],
+    [it.model === S.model, 'Model: entry is ' + MODELS[it.model] + ', selected model is ' + MODELS[S.model]],
+    [it.kind !== 'altro', 'Type recognised: ' + KINDS[it.kind]],
+    [!!(msgs && !validate(msgs)), 'Integrity: CRC32 and SysEx structure verified'],
+    [fresh || $('ackNoBackup').checked,
+      fresh ? 'Bank backup from the last 60 minutes found'
+      : $('ackNoBackup').checked ? 'No recent backup: you chose to continue anyway'
+      : 'No bank backup in the last 60 minutes: record one (step 1) or confirm below'],
+  ];
+  if (it.kind === 'single') rows.push([$('ackSlot').checked, 'Target slot confirmed on the synth’s display']);
+  return {it, rows, msgs, can: rows.every(r => r[0]) && !sending};
+}
+function renderSend(){
+  const {it, rows, can} = evalSend();
+  if (!it) return;
+  const sizeTxt = it.size + ' bytes, CRC32 ' + it.crc;
+  const item = $('sendItem');
+  item.replaceChildren(h('b', {}, it.name), ' — ' + KINDS[it.kind] + ', ' + MODELS[it.model] + ', ' + sizeTxt);
+  const ul = $('checklist'); ul.replaceChildren();
+  for (const [ok, label] of rows) ul.append(h('li', {class:ok ? 'ok' : 'no'}, label));
+  $('nobackupBox').hidden = freshBackup();
+  $('singleBox').hidden = it.kind !== 'single';
+  $('bankBox').hidden = it.kind !== 'bank';
+  $('btnPC').disabled = !(unlocked && outPort) || sending;
+  $('btnSend').disabled = !can;
+  $('btnDlgX').disabled = sending; $('btnDlgCancel').disabled = sending;
+}
+async function doSend(){
+  const ev = evalSend();
+  if (!ev.can) return;
+  const {it, msgs} = ev;
+  const what = it.kind === 'bank'
+    ? 'REPLACE THE ENTIRE BANK of presets on the ' + MODELS[it.model] + ' with “' + it.name + '”'
+    : 'write the preset “' + it.name + '” into the slot currently selected on the ' + MODELS[it.model];
+  if (!confirm('You are about to ' + what + '.\n\nThis cannot be undone from this page. Continue?')) return;
+  sending = true; renderSend();
+  let ok = false;
+  try {
+    for (let i = 0; i < msgs.length; i++){
+      outPort.send(msgs[i]);
+      log('Sent SysEx ' + (i + 1) + '/' + msgs.length + ' (' + msgs[i].length + ' bytes)');
+      await sleep(500);
+    }
+    ok = true;
+  } catch (err){
+    say('Send failed: ' + err.message);
+    log('Send error: ' + err.message);
+  } finally {
+    sending = false; resetAcks(); unlocked = false; $('unlock').checked = false;
+    closeSend();
+  }
+  if (ok) say('Sent. The synth’s display should have shown “RECEIVING …”. To verify, record the preset again from the synth and use Compare.');
+}
+function sendProgramChange(){
+  const n = parseInt($('slotNum').value, 10);
+  if (!unlocked || !outPort || !(n >= 0 && n <= 99)) return;
+  try {
+    outPort.send([0xC0 | (S.chOut - 1), n]);
+    log('Sent Program Change ' + n + ' on channel ' + S.chOut);
+    say('Program Change ' + n + ' sent. Check that the synth’s display shows preset ' + n + ' before you continue.');
+  } catch (err){ say('Error: ' + err.message); }
+}
+
+/* ------------------------------------------------------------------
+   Importing .syx files
+------------------------------------------------------------------- */
+async function importFiles(files){
+  for (const f of files){
+    if (f.size > MAX_TOTAL){ say(f.name + ': file too large (over ' + MAX_TOTAL + ' bytes), rejected.'); continue; }
+    const p = parseSysex(new Uint8Array(await f.arrayBuffer()));
+    if (p.err){ say(f.name + ': ' + p.err + '. Rejected.'); continue; }
+    const why = validate(p.msgs);
+    if (why){ say(f.name + ': rejected, ' + why + '.'); continue; }
+    const bytes = concat(p.msgs), kind = classify(bytes.length);
+    const it = makeItem(bytes, p.msgs.length, kind, 'file', f.name.replace(/\.[^.]+$/, ''));
+    if (addItem(it)) say('Imported “' + it.name + '” (' + KINDS[kind] + ', ' + bytes.length + ' bytes).' +
+                         (kind === 'altro' ? ' The size matches neither a preset nor a bank: archived but cannot be sent.' : ''));
+  }
+}
+
+/* ------------------------------------------------------------------
+   MIDI ports (SysEx access required)
+------------------------------------------------------------------- */
+const isMoog = p => /phatty|moog/i.test((p.name || '') + ' ' + (p.manufacturer || ''));
+
+function onMidi(e){
+  const d = e.data;
+  if (d[0] === 0xF8 || d[0] === 0xFE) return;
+  if (capture){ feed(d); return; }
+  if (d[0] === 0xF0) log('SysEx received while not recording: ignored (' + d.length + ' bytes)');
+}
+function setIn(p){ if (inPort) inPort.onmidimessage = null; inPort = p; if (p) p.onmidimessage = onMidi; }
+function setOut(p){ outPort = p; unlocked = false; $('unlock').checked = false; renderSend(); }
+function fill(sel, ports, currentId){
+  sel.replaceChildren(new Option('None', ''));
+  for (const p of ports) sel.add(new Option(p.name, p.id));
+  sel.value = ports.some(p => p.id === currentId) ? currentId : '';
+}
+function setModel(m){
+  if (!MODELS[m]) return;
+  S.model = m; $('selModel').value = m; save(); updateStatus(); renderSend();
+}
+function refreshPorts(){
+  const ins  = [...midi.inputs.values()].filter(p => p.state === 'connected');
+  const outs = [...midi.outputs.values()].filter(p => p.state === 'connected');
+  portCount = ins.length + outs.length;
+  if (inPort  && !ins.some(p => p.id === inPort.id))   { setIn(null);  manualIn = false;  if (capture) cancelCapture('MIDI In was disconnected: recording cancelled.'); }
+  if (outPort && !outs.some(p => p.id === outPort.id)) { setOut(null); manualOut = false; }
+  if (!inPort  && !manualIn)  { const m = ins.find(isMoog)  || ins.find(p => S.saved.in  && p.name === S.saved.in);  if (m) setIn(m); }
+  if (!outPort && !manualOut) { const m = outs.find(isMoog) || outs.find(p => S.saved.out && p.name === S.saved.out); if (m) setOut(m); }
+  const n = (inPort && inPort.name) || (outPort && outPort.name) || '';
+  if (/slim/i.test(n)) setModel('sp'); else if (/little/i.test(n)) setModel('lp');
+  fill($('selIn'), ins, inPort && inPort.id);
+  fill($('selOut'), outs, outPort && outPort.id);
+  updateStatus(); renderSend();
+}
+function updateStatus(){
+  if (!midi) return;
+  const dot = $('led'), txt = $('statusText'), M = MODELS[S.model];
+  const named = (inPort && isMoog(inPort)) ? inPort : (outPort && isMoog(outPort)) ? outPort : null;
+  dot.className = 'dot';
+  if (inPort && outPort){
+    dot.classList.add('on');
+    txt.textContent = named ? M + ' connected' : 'Ports selected · model ' + M;
+  } else if (inPort || outPort){
+    dot.classList.add('on');
+    txt.textContent = M + ': MIDI ' + (inPort ? 'Out' : 'In') + ' port missing';
+  } else {
+    txt.textContent = portCount > 0 ? 'No Moog port found: choose one below' : 'No instrument detected';
+  }
+}
+async function initMidi(){
+  if (!navigator.requestMIDIAccess){
+    $('led').className = 'dot err';
+    $('statusText').textContent = 'Web MIDI is not supported. Use Chrome or Edge.';
+    return;
+  }
+  try {
+    midi = await navigator.requestMIDIAccess({sysex:true});
+  } catch (err){
+    $('led').className = 'dot err';
+    $('statusText').textContent = 'SysEx permission denied. Allow it in the site settings and reload.';
+    return;
+  }
+  midi.onstatechange = refreshPorts;
+  refreshPorts();
+}
+
+/* ------------------------------------------------------------------
+   Messages and monitor
+------------------------------------------------------------------- */
+function say(t){ $('msg').textContent = t; }
+const logLines = [];
+function log(t){
+  logLines.unshift(new Date().toLocaleTimeString('en-GB') + '  ' + t);
+  if (logLines.length > 80) logLines.length = 80;
+  $('logBox').textContent = logLines.join('\n');
+}
+
+/* ------------------------------------------------------------------
+   Start-up
+------------------------------------------------------------------- */
+function init(){
+  load();
+
+  // help toggles (the “?” buttons)
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.qhelp');
+    if (!b) return;
+    const box = $(b.getAttribute('aria-controls'));
+    const open = box.hidden;
+    box.hidden = !open;
+    b.setAttribute('aria-expanded', String(open));
+  });
+
+  const selModel = $('selModel'), selCh = $('selChOut');
+  for (const [k, v] of Object.entries(MODELS)) selModel.add(new Option(v, k));
+  selModel.value = S.model;
+  selModel.onchange = () => setModel(selModel.value);
+  for (let i = 1; i <= 16; i++) selCh.add(new Option(i, i));
+  selCh.value = S.chOut;
+  selCh.onchange = () => { S.chOut = +selCh.value; save(); };
+
+  $('selIn').onchange = e => {
+    manualIn = true;
+    if (capture) cancelCapture('Port changed: recording cancelled.');
+    setIn(e.target.value ? midi.inputs.get(e.target.value) : null);
+    S.saved.in = inPort ? inPort.name : ''; save(); updateStatus();
+  };
+  $('selOut').onchange = e => {
+    manualOut = true;
+    setOut(e.target.value ? midi.outputs.get(e.target.value) : null);
+    S.saved.out = outPort ? outPort.name : ''; save(); updateStatus();
+  };
+
+  $('btnCapSingle').onclick = () => armCapture('single');
+  $('btnCapBank').onclick   = () => armCapture('bank');
+  $('btnCapCancel').onclick = () => cancelCapture('Recording cancelled.');
+  $('btnImport').onclick    = () => $('fileImport').click();
+  $('fileImport').onchange  = e => { importFiles([...e.target.files]); e.target.value = ''; };
+  $('btnCompare').onclick   = compareSelected;
+
+  const dlg = $('sendDlg');
+  $('unlock').onchange = e => setUnlocked(e.target.checked);
+  for (const id of ['ackNoBackup', 'ackSlot']) $(id).onchange = renderSend;
+  $('btnPC').onclick = sendProgramChange;
+  $('btnSend').onclick = doSend;
+  $('btnDlgX').onclick = closeSend;
+  $('btnDlgCancel').onclick = closeSend;
+  dlg.addEventListener('cancel', e => { if (sending) e.preventDefault(); });   // Esc is ignored while sending
+  dlg.addEventListener('close', () => { unlocked = false; $('unlock').checked = false; resetAcks(); selectedId = null; });
+
+  renderLib(); renderCapture();
+  initMidi();
+}
+init();
+})();
+</script>
+</body>
+</html>
