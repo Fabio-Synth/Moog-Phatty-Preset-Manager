@@ -193,9 +193,9 @@
   .capstate:not(.armed) .pulse{background:var(--ink-dim)}
 
   /* ---------- library ---------- */
-  .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:12px}
+  .toolbar{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:12px}
   .toolbar .spacer{flex:1}
-  .tblwrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r-md)}
+  .tblwrap{overflow:auto; max-height:478px; border:1px solid var(--line); border-radius:var(--r-md)}
   table.lib{width:100%; border-collapse:collapse; min-width:660px; font-size:.9rem}
   .lib th{position:sticky; top:0; text-align:left; padding:11px 12px; background:var(--card-2); color:var(--ink-dim); font-family:var(--mono); font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid var(--line)}
   .lib td{padding:10px 12px; border-bottom:1px solid var(--line2); vertical-align:middle}
@@ -388,11 +388,12 @@
         <p>The transfer is always started <b>from the synth</b>; this page listens and stores what arrives.</p>
         <ol>
           <li>Press <b>MASTER</b>, then <b>CURSOR</b> to highlight the SYSEX menu items.</li>
-          <li>Turn <b>VALUE</b> to <b>SEND CURRENT PRESET</b> (one preset) or <b>SEND ALL PRESETS</b> (whole bank).</li>
+          <li>Turn <b>VALUE</b> to <b>SEND CURRENT PRESET</b> (one preset), or to <b>SEND ALL PRESETS</b> or <b>BULK DUMP</b> for the whole bank — either works here.</li>
           <li>Click the matching button here.</li>
           <li>Press <b>ENTER</b> on the synth and wait: a bank takes a few seconds.</li>
         </ol>
         <p>“Single preset” saves only the preset currently selected on the synth. To back up several presets, either repeat the procedure for each one or record the full bank once.</p>
+        <p>The synth's SysEx menu actually offers three distinct commands: <b>SEND CURRENT PRESET</b>, <b>SEND ALL PRESETS</b> and <b>BULK DUMP</b>. The first is a single preset; the other two both send the complete bank (BULK DUMP also includes global and performance settings) — “Record full bank” accepts either one.</p>
         <p>If a recording is rejected because of its size, the reason is shown in the status bar.</p>
       </div>
       <p class="sub">Record one preset or the entire bank sent by your synth.</p>
@@ -425,10 +426,13 @@
         <p>Entries marked <i>Unclassified</i> are archived but cannot be sent.</p>
       </div>
       <div class="toolbar">
-        <button class="btn ghost" id="btnImport" type="button">Import .syx…</button>
+        <button class="btn ghost sm" id="btnImport" type="button">Import .syx…</button>
         <input type="file" id="fileImport" accept=".syx,application/octet-stream" multiple hidden>
+        <button class="btn ghost sm" id="btnSelectAll" type="button" disabled>Select all</button>
+        <button class="btn ghost sm" id="btnDlSelected" type="button" hidden>Download selected</button>
+        <button class="btn ghost sm" id="btnDelSelected" type="button" hidden>Delete selected</button>
         <span class="spacer"></span>
-        <button class="btn ghost" id="btnCompare" type="button" disabled>Compare selected (0/2)</button>
+        <button class="btn ghost sm" id="btnCompare" type="button" disabled>Compare selected (0/2)</button>
       </div>
       <div class="tblwrap">
         <table class="lib">
@@ -528,11 +532,15 @@ const hex = b => b.toString(16).toUpperCase().padStart(2, '0');
    - Moog manufacturer ID: 0x04
    - a complete bank is about 16-17 KB, a single preset a few hundred bytes
    - nothing above MAX_TOTAL is accepted or sent
+   - the synth has 100 preset slots (00-99): both "SEND ALL PRESETS" and
+     "BULK DUMP" can transmit the bank as one message per preset, so the
+     message-count cap must comfortably clear 100 (with headroom for the
+     extra global/performance messages a bulk dump adds)
 ------------------------------------------------------------------- */
 const MODELS   = {lp:'Little Phatty', sp:'Slim Phatty'};
 const KINDS    = {single:'Single preset', bank:'Full bank', altro:'Unclassified'};
 const SIZE     = {single:[32, 2048], bank:[8192, 32768]};
-const MAX_MSGS = 8, MAX_TOTAL = 65536, MOOG_ID = 0x04, FRESH_MS = 60 * 60 * 1000;
+const MAX_MSGS = 128, MAX_TOTAL = 65536, MOOG_ID = 0x04, FRESH_MS = 60 * 60 * 1000;
 const IDLE_MS  = 2000, ABORT_MS = 20000;
 const LS_KEY   = 'phatty-presets-v1';
 
@@ -663,15 +671,15 @@ function renderLib(){
   tb.replaceChildren();
   if (!S.library.length){
     tb.append(h('tr', {}, h('td', {colspan:'6', class:'empty'}, 'Your library is empty. Record a preset from the synth or import a .syx file.')));
-    updateCompareBtn();
+    updateSelectionUI();
     return;
   }
   const items = [...S.library].sort((a, b) => b.date.localeCompare(a.date));
   for (const it of items){
     const tr = h('tr');
-    const chk = h('input', {type:'checkbox', 'aria-label':'Select “' + it.name + '” for comparison'});
+    const chk = h('input', {type:'checkbox', 'aria-label':'Select “' + it.name + '”'});
     chk.dataset.id = it.id;
-    chk.addEventListener('change', updateCompareBtn);
+    chk.addEventListener('change', updateSelectionUI);
     const name = h('input', {type:'text', value:it.name, 'aria-label':'Name', maxlength:'60'});
     name.addEventListener('change', () => { it.name = name.value.trim() || it.name; save(); });
     const acts = h('div', {class:'acts'});
@@ -697,15 +705,59 @@ function renderLib(){
       h('td', {class:'nowrap'}, acts));
     tb.append(tr);
   }
-  updateCompareBtn();
+  updateSelectionUI();
 }
 function checkedIds(){
   return [...document.querySelectorAll('#libBody input[type=checkbox]:checked')].map(c => c.dataset.id);
+}
+function allCheckboxes(){
+  return [...document.querySelectorAll('#libBody input[type=checkbox]')];
 }
 function updateCompareBtn(){
   const n = checkedIds().length;
   $('btnCompare').textContent = 'Compare selected (' + n + '/2)';
   $('btnCompare').disabled = n !== 2;
+}
+function updateBulkButtons(){
+  const n = checkedIds().length;
+  const dl = $('btnDlSelected'), del = $('btnDelSelected');
+  dl.hidden = del.hidden = n === 0;
+  if (n){
+    dl.textContent = 'Download selected (' + n + ')';
+    del.textContent = 'Delete selected (' + n + ')';
+  }
+}
+function updateSelectAllBtn(){
+  const boxes = allCheckboxes();
+  const allChecked = boxes.length > 0 && boxes.every(c => c.checked);
+  $('btnSelectAll').textContent = allChecked ? 'Deselect all' : 'Select all';
+  $('btnSelectAll').disabled = boxes.length === 0;
+}
+function updateSelectionUI(){
+  updateCompareBtn();
+  updateBulkButtons();
+  updateSelectAllBtn();
+}
+function toggleSelectAll(){
+  const boxes = allCheckboxes();
+  if (!boxes.length) return;
+  const allChecked = boxes.every(c => c.checked);
+  boxes.forEach(c => { c.checked = !allChecked; });
+  updateSelectionUI();
+}
+function downloadSelected(){
+  const ids = checkedIds();
+  ids.forEach((id, i) => {
+    const it = S.library.find(x => x.id === id);
+    if (it) setTimeout(() => download(it), i * 300);
+  });
+}
+function deleteSelected(){
+  const ids = checkedIds();
+  if (!ids.length) return;
+  if (!confirm('Delete ' + ids.length + ' selected item(s) from this browser’s library? Files you downloaded are not affected.')) return;
+  S.library = S.library.filter(x => !ids.includes(x.id));
+  save(); renderLib();
 }
 function compareSelected(){
   const ids = checkedIds();
@@ -1024,6 +1076,9 @@ function init(){
   $('btnImport').onclick    = () => $('fileImport').click();
   $('fileImport').onchange  = e => { importFiles([...e.target.files]); e.target.value = ''; };
   $('btnCompare').onclick   = compareSelected;
+  $('btnSelectAll').onclick   = toggleSelectAll;
+  $('btnDlSelected').onclick  = downloadSelected;
+  $('btnDelSelected').onclick = deleteSelected;
 
   const dlg = $('sendDlg');
   $('unlock').onchange = e => setUnlocked(e.target.checked);
