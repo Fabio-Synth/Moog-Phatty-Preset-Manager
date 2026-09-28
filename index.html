@@ -109,6 +109,11 @@
   .browser-note-in{max-width:1180px; margin:0 auto; padding:6px 24px; display:flex; align-items:center; gap:8px; font-size:.76rem; color:var(--ink-dim); font-style:italic}
   .browser-note-in svg{width:13px; height:13px; flex:none; color:var(--slate); opacity:.8}
   .browser-note-in b{color:var(--ink2); font-weight:700; font-style:normal}
+  .btn-editor{display:inline-flex; align-items:center; gap:7px; padding:5px 12px; border-radius:20px; font-weight:600; font-size:.78rem;
+    color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.45); text-decoration:none; white-space:nowrap; transition:background .15s, color .15s, border-color .15s}
+  .btn-editor svg{width:15px; height:15px; flex:none}
+  .btn-editor:hover{background:#fff; color:var(--slate-dim); border-color:#fff}
+  .btn-editor:focus-visible{outline:none; box-shadow:0 0 0 2px var(--slate-dim), 0 0 0 4px rgba(255,255,255,.6)}
   .contact-links{display:flex; align-items:center; gap:4px; margin-right:auto}
   .contact-links a{display:flex; align-items:center; justify-content:center; width:29px; height:29px; border-radius:var(--r-sm); color:rgba(255,255,255,.82); border:1px solid transparent; transition:color .15s, background .15s, border-color .15s}
   .contact-links a svg{width:16px; height:16px}
@@ -312,6 +317,10 @@
 <nav class="contact-bar" aria-label="Contact and support">
  <div class="contact-bar-in">
   <span class="contact-label">Fabio Synth</span>
+  <a class="btn-editor" href="https://fabio-synth.github.io/Moog-phatty-editor/" target="_blank" rel="noopener" title="Moog Little Phatty Editor">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 12l3.2-3.2"/><path d="M12 4v1.5M20 12h-1.5M12 20v-1.5M4 12h1.5"/></svg>
+    Little Phatty Editor
+  </a>
   <div class="contact-links">
     <a href="https://fabiopiras.synthonia.com/" target="_blank" rel="noopener" title="Sound library">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 5.6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.6-4-9s1.5-6.5 4-9z"/></svg>
