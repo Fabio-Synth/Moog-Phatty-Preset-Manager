@@ -916,7 +916,11 @@ async function doSend(){
     for (let i = 0; i < msgs.length; i++){
       outPort.send(msgs[i]);
       log('Sent SysEx ' + (i + 1) + '/' + msgs.length + ' (' + msgs[i].length + ' bytes)');
-      await sleep(500);
+      // Full bank: the synth expects the ~100 per-preset messages back-to-back to stay
+      // in its "RECEIVING ALL PRESETS" state and auto-advance the target slot. A long
+      // pause here makes it drop back to single-preset behaviour (always slot 00).
+      // Single preset: only one message is sent, so the original pause is kept.
+      await sleep(it.kind === 'bank' ? 20 : 500);
     }
     ok = true;
   } catch (err){
